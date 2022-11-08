@@ -26,7 +26,7 @@ class _ResultsState extends State<Results> {
       body: Container(
           child: FutureBuilder(
               initialData: [databaseHandler.selectAllbooks()],
-              future: databaseHandler.selectAllbooks(),
+              future: databaseHandler.selectSpecific(widget.searchValue),
               builder: (context, snapshot) {
                 return ListView.builder(
                     itemCount: snapshot.data.length,

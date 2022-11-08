@@ -25,17 +25,41 @@ class Hello extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hello'),
+        leading: IconButton(
+          onPressed: () {
+            
+          },
+            icon: Icon(
+          Icons.library_books_outlined,
+          color: Colors.black,
+          size: 20,
+        )),
+        title: Text(
+          'Notes',
+          style: TextStyle(
+              color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: Center(child: BookList()),
+      body: Container(
+        width: size.width,
+        height: size.height,
+        child: BookList(),
+      ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
         onPressed: () {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => SecondPage()));
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: Colors.greenAccent,
+        ),
       ),
     );
   }
@@ -53,6 +77,8 @@ class BookList extends StatefulWidget {
 class _BookListState extends State<BookList> {
   TextEditingController hello = TextEditingController();
   DatabaseHandler databaseHandler = DatabaseHandler();
+  bool pressed = false;
+  var key1 = GlobalKey<FormState>();
   @override
   void initState() {
     hello = TextEditingController();
@@ -61,76 +87,159 @@ class _BookListState extends State<BookList> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
-      child: Stack(
-        children: [
-          Positioned(
-            top: 10,
-            left: 10,
-            right: 10,
-            child: TextField(
-              decoration: InputDecoration(
-                  labelText: 'Search',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20))),
-              controller: hello,
-              keyboardType: TextInputType.text,
-              onSubmitted: (value) {
-                databaseHandler.search(value);
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Results(searchValue: value)));
-              },
+      padding: EdgeInsets.all(10),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Form(
+              key: key1,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: TextFormField(
+                  validator: ((String value) {
+                    if (value.isEmpty) {
+                      return 'Enter search value';
+                    }
+                    return null;
+                  }),
+                  enabled: pressed,
+                  decoration: pressed
+                      ? InputDecoration(
+                          isCollapsed: false,
+                          suffixIcon: Icon(
+                            Icons.search_outlined,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          labelText: 'Search',
+                          hintText: 'Enter book title',
+                          hintStyle: TextStyle(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          ))
+                      : InputDecoration(
+                          isCollapsed: false,
+                          suffixIcon: Icon(
+                            Icons.search_outlined,
+                            color: Colors.black,
+                            size: 16,
+                          ),
+                          hintText: 'Enter book title',
+                          hintStyle: TextStyle(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          )),
+                  controller: hello,
+                  keyboardType: TextInputType.text,
+                  onTap: () {
+                    setState(() {
+                      pressed = true;
+                    });
+                  },
+                  onFieldSubmitted: (value) {
+                    databaseHandler.search(value);
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Results(searchValue: value)));
+                  },
+                ),
+              ),
             ),
-          ),
-          Positioned(
-            top: 70,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: FutureBuilder<List<Book>>(
-                future: databaseHandler.selectAllbooks(),
-                builder: (context, hello) => hello.connectionState !=
-                        ConnectionState.done
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : hello.data.length == 0
-                        ? Center(
-                            child: Text('NO DATA LEFT'),
-                          )
-                        : ListView.builder(
-                            itemCount: hello.data.length,
-                            itemBuilder: (BuildContext context, int value) {
-                              return Dismissible(
-                                key: Key(value.toString()),
-                                onDismissed: (direction) {
-                                  databaseHandler
-                                      .deleteData(hello.data[value].id);
-                                  hello.data.removeAt(value);
-                                  setState(() {});
-                                },
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(hello.data[value].book_name),
-                                    subtitle: Text(hello.data[value].author),
-                                    trailing: IconButton(
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () async {
-                                        await Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SecondPage(
-                                                      book: hello.data[value],
-                                                    )));
-                                        setState(() {});
-                                      },
+            Container(
+              margin: EdgeInsets.only(top: 20, bottom: 20),
+              width: size.width,
+              height: size.height,
+              child: FutureBuilder<List<Book>>(
+                  initialData: [],
+                  future: databaseHandler.selectAllbooks(),
+                  builder: (context, hello) => hello.connectionState !=
+                          ConnectionState.done
+                      ? Center(
+                          child: Column(
+                          children: [
+                            CircularProgressIndicator(
+                              color: Colors.black,
+                            ),
+                            Text("Loading",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold))
+                          ],
+                        ))
+                      : hello.data.length == 0
+                          ? Center(
+                              child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image(
+                                  image: AssetImage("lib/photos/error.jpg"),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Text("No Data",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 24,
+                                    ))
+                              ],
+                            ))
+                          : ListView.builder(
+                              itemCount: hello.data.length,
+                              itemBuilder: (BuildContext context, int value) {
+                                return Dismissible(
+                                  key: Key(value.toString()),
+                                  onDismissed: (direction) {
+                                    databaseHandler
+                                        .deleteData(hello.data[value].id);
+                                    hello.data.removeAt(value);
+                                    setState(() {});
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            bottomRight: Radius.circular(20))),
+                                    color: Colors.black,
+                                    child: ListTile(
+                                      title: Text(
+                                        hello.data[value].book_name,
+                                        style: TextStyle(
+                                            color: Colors.greenAccent,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Text(
+                                        hello.data[value].author,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      trailing: IconButton(
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () async {
+                                          await Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SecondPage(
+                                                        book: hello.data[value],
+                                                      )));
+                                          setState(() {});
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            })),
-          ),
-        ],
+                                );
+                              })),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -282,10 +391,10 @@ class _SecondPageState extends State<SecondPage> {
                           controller2.text,
                           int.parse(controller3.text)));
                       Navigator.pop(context);
-                    
+
                       return;
                     }
-                    
+
                     Book book = Book.withId(
                         int.parse(controller.text),
                         controller1.text,
@@ -295,6 +404,7 @@ class _SecondPageState extends State<SecondPage> {
                     if (success == 0) {
                       print('not successful');
                     }
+                    setState(() {});
                   },
                   child: Text(
                     widget.book != null ? 'Update' : 'Save',
