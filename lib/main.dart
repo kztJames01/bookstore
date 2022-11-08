@@ -1,67 +1,150 @@
 import 'package:bookstore/books.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:bookstore/database_handler.dart';
 import 'package:bookstore/results.dart';
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
-void main() => runApp(Home());
+void main() => runApp(Hello());
 
-class Home extends StatefulWidget {
-  Home({Key key}) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: Hello());
-  }
-}
-
-class Hello extends StatelessWidget {
+class Hello extends StatefulWidget {
   const Hello({Key key}) : super(key: key);
 
   @override
+  State<Hello> createState() => _HelloState();
+}
+
+class _HelloState extends State<Hello> with TickerProviderStateMixin {
+  AdvancedDrawerController controller;
+  @override
+  void initState() {
+    controller = AdvancedDrawerController();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            
-          },
-            icon: Icon(
-          Icons.library_books_outlined,
-          color: Colors.black,
-          size: 20,
-        )),
-        title: Text(
-          'Notes',
-          style: TextStyle(
-              color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Container(
-        width: size.width,
-        height: size.height,
-        child: BookList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
-        onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => SecondPage()));
-        },
-        child: Icon(
-          Icons.add,
-          color: Colors.greenAccent,
-        ),
-      ),
-    );
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: AdvancedDrawer(
+            childDecoration:
+                BoxDecoration(borderRadius: BorderRadius.circular(20)),
+            controller: controller,
+            backdropColor: Colors.black,
+            child: Scaffold(
+         
+              appBar: AppBar(
+                leading: IconButton(
+                    onPressed: () => controller.showDrawer(),
+                    icon: ValueListenableBuilder<AdvancedDrawerValue>(
+                    valueListenable: controller,
+                    builder: ((context, value, child) {
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: Icon(
+                          value.visible
+                              ? Icons.clear
+                              : Icons.library_books_outlined,
+                          color: Colors.black,
+                          key: ValueKey<bool>(value.visible),
+                        ),
+                      );
+                    }),
+                  )),
+                title: Text(
+                  'Notes',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold),
+                ),
+                backgroundColor: Colors.white,
+                elevation: 0,
+              ),
+              body: Container(
+         
+                child: BookList(),
+              ),
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.black,
+                onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => SecondPage()));
+                },
+                child: Icon(
+                  Icons.add,
+                  color: Colors.greenAccent,
+                ),
+              ),
+            ),
+            drawer: Container(
+              margin: EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
+              child: ListTileTheme(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                style: ListTileStyle.drawer,
+                iconColor: Colors.greenAccent,
+                textColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.only(top: 20, bottom: 20, right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Theme.of(context).primaryColorLight),
+                          image: const DecorationImage(
+                              image: AssetImage("lib/photos/error.jpg")),
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    RichText(
+                        text: TextSpan(children: [
+                      TextSpan(
+                          text: "Kaung Zaw Thant\n\n",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold)),
+                      const TextSpan(
+                          text: "Level 1",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold))
+                    ])),
+                    ListTile(
+                      onTap: () {},
+                      leading:
+                          const Icon(FluentIcons.person_accounts_24_regular),
+                      title: const Text("My Account"),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      leading: const Icon(FluentIcons.history_24_regular),
+                      title: const Text("Pomodoro List"),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      leading: const Icon(FluentIcons.settings_24_regular),
+                      title: const Text("Settings"),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      leading: const Icon(FluentIcons.contact_card_24_regular),
+                      title: const Text("Contact Us"),
+                    ),
+                  ],
+                ),
+              ),
+            )));
   }
 }
 
@@ -74,17 +157,20 @@ class BookList extends StatefulWidget {
   _BookListState createState() => _BookListState();
 }
 
-class _BookListState extends State<BookList> {
+class _BookListState extends State<BookList> with TickerProviderStateMixin {
   TextEditingController hello = TextEditingController();
   DatabaseHandler databaseHandler = DatabaseHandler();
-  bool pressed = false;
-  var key1 = GlobalKey<FormState>();
+
   @override
   void initState() {
     hello = TextEditingController();
+
     super.initState();
   }
 
+  bool pressed = false;
+  var key1 = GlobalKey<FormState>();
+  @override
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
