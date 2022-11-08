@@ -1,43 +1,506 @@
 import 'package:bookstore/books.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bookstore/database_handler.dart';
 import 'package:bookstore/results.dart';
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
-void main() => runApp(Home());
+void main() => runApp(Hi());
 
-class Home extends StatefulWidget {
-  Home({Key key}) : super(key: key);
+class Hi extends StatefulWidget {
+  const Hi({
+    Key key,
+  }) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  State<Hi> createState() => _HiState();
 }
 
-class _HomeState extends State<Home> {
+class _HiState extends State<Hi> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: Hello());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Hello(
+        book: Book(),
+      ),
+    );
   }
 }
 
-class Hello extends StatelessWidget {
-  const Hello({Key key}) : super(key: key);
+class Hello extends StatefulWidget {
+  final Book book;
+  const Hello({Key key, this.book}) : super(key: key);
+
+  @override
+  State<Hello> createState() => _HelloState();
+}
+
+class _HelloState extends State<Hello> with TickerProviderStateMixin {
+  AdvancedDrawerController drawercontroller;
+
+  TextEditingController controller = TextEditingController();
+  TextEditingController controller1 = TextEditingController();
+  TextEditingController controller2 = TextEditingController();
+  TextEditingController controller3 = TextEditingController();
+  var key = GlobalKey<FormState>();
+  bool pressed = false;
+  DatabaseHandler databasehandler;
+  @override
+  void initState() {
+    drawercontroller = AdvancedDrawerController();
+    super.initState();
+    controller = TextEditingController();
+    controller1 = TextEditingController();
+    controller2 = TextEditingController();
+    controller3 = TextEditingController();
+    databasehandler = DatabaseHandler();
+    if (widget.book != null) {
+      controller.text = widget.book.id.toString();
+      controller1.text = widget.book.book_name;
+      controller2.text = widget.book.author;
+      controller3.text = widget.book.price.toString();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hello'),
-      ),
-      body: Center(child: BookList()),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => SecondPage()));
-        },
-        child: Icon(Icons.add),
-      ),
-    );
+    var size = MediaQuery.of(context).size;
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Builder(
+          builder: (BuildContext context) {
+            return AdvancedDrawer(
+                childDecoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                controller: drawercontroller,
+                backdropColor: Colors.black,
+                child: Scaffold(
+                    appBar: AppBar(
+                      leading: IconButton(
+                          onPressed: () => drawercontroller.showDrawer(),
+                          icon: ValueListenableBuilder<AdvancedDrawerValue>(
+                            valueListenable: drawercontroller,
+                            builder: ((context, value, child) {
+                              return AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                child: Icon(
+                                  value.visible
+                                      ? Icons.clear
+                                      : Icons.library_books_outlined,
+                                  color: Colors.black,
+                                  key: ValueKey<bool>(value.visible),
+                                ),
+                              );
+                            }),
+                          )),
+                      title: Text(
+                        'Notes',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: Colors.white,
+                      elevation: 0,
+                    ),
+                    body: Container(
+                      child: BookList(),
+                    ),
+                    floatingActionButton: FloatingActionButton(
+                      backgroundColor: Colors.black,
+                      onPressed: () {
+                        showModalBottomSheet(
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            elevation: 10,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20))),
+                            context: context,
+                            builder: (context) => SizedBox(
+                                  width: size.width,
+                                  height: size.height * 0.65,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Form(
+                                        key: key,
+                                        child: Container(
+                                          width: size.width,
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 10),
+                                          padding: EdgeInsets.all(10),
+                                          child: Column(
+                                            children: [
+                                              TextFormField(
+                                                onTap: () {
+                                                  setState(() {
+                                                    pressed = true;
+                                                  });
+                                                },
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                decoration: pressed == true
+                                                    ? InputDecoration(
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        labelText: "ID",
+                                                        labelStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                        hintText: "ID Number",
+                                                        hintStyle:
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .white10,
+                                                                fontSize: 16,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                      )
+                                                    : const InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.all(10),
+                                                        hintText: "ID Number",
+                                                        hintStyle: TextStyle(
+                                                            color:
+                                                                Colors.white10,
+                                                            fontSize: 16,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                      ),
+                                                controller: controller,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                validator: (value) {
+                                                  if (value.isEmpty) {
+                                                    return 'Enter the ID Number';
+                                                  }
+                                                  return '';
+                                                },
+                                                onFieldSubmitted: ((value) =>
+                                                    controller.text),
+                                              ),
+                                              TextFormField(
+                                                onTap: () {
+                                                  setState(() {
+                                                    pressed = true;
+                                                  });
+                                                },
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                decoration: pressed == true
+                                                    ? InputDecoration(
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        labelText: "Title",
+                                                        labelStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                        hintText: "Enter the title",
+                                                        hintStyle:
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .white10,
+                                                                fontSize: 16,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                      )
+                                                    : const InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.all(10),
+                                                        hintText: "Enter the title",
+                                                        hintStyle: TextStyle(
+                                                            color:
+                                                                Colors.white10,
+                                                            fontSize: 16,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                      ),
+                                                controller: controller2,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                validator: (value) {
+                                                  if (value.isEmpty) {
+                                                    return 'Enter the category';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                              TextFormField(
+                                                onTap: () {
+                                                  setState(() {
+                                                    pressed = true;
+                                                  });
+                                                },
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                decoration: pressed == true
+                                                    ? InputDecoration(
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        labelText: "Category",
+                                                        labelStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                        hintText: "Enter the category",
+                                                        hintStyle:
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .white10,
+                                                                fontSize: 16,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                      )
+                                                    : const InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.all(10),
+                                                        hintText: "Enter the category",
+                                                        hintStyle: TextStyle(
+                                                            color:
+                                                                Colors.white10,
+                                                            fontSize: 16,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                      ),
+                                                controller: controller3,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                validator: (value) {
+                                                  if (value.isEmpty) {
+                                                    return 'Enter the frequency';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                              TextFormField(
+                                                onTap: () {
+                                                  setState(() {
+                                                    pressed = true;
+                                                  });
+                                                },
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                decoration: pressed == true
+                                                    ? InputDecoration(
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        labelText: "Time",
+                                                        labelStyle: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                        hintText: "Enter the time",
+                                                        hintStyle:
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .white10,
+                                                                fontSize: 16,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                      )
+                                                    : const InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.all(10),
+                                                        hintText: "Enter the time",
+                                                        hintStyle: TextStyle(
+                                                            color:
+                                                                Colors.white10,
+                                                            fontSize: 16,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                      ),
+                                                controller: controller1,
+                                                keyboardType:
+                                                    TextInputType.text,
+                                                validator: (value) {
+                                                  if (value.isEmpty) {
+                                                    return 'Enter the time';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "Choose your timer",
+                                        style: TextStyle(
+                                            color:
+                                                Colors.black,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      CupertinoTimerPicker(
+                                        backgroundColor: Colors.white,
+                                        onTimerDurationChanged: (value) {
+                                          setState(() {});
+                                        },
+                                      ),
+                                      MaterialButton(
+                                        height: 50,
+                                        minWidth: 300,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                        color: Colors.black,
+                                        onPressed: () async {
+                                          if (!key.currentState.validate()) {
+                                            return;
+                                          }
+                                          if (widget.book != null) {
+                                            await databasehandler.updateData(
+                                                Book.withId(
+                                                    widget.book.id,
+                                                    controller1.text,
+                                                    controller2.text,
+                                                    int.parse(
+                                                        controller3.text)));
+                                            Navigator.pop(context);
+
+                                            return;
+                                          }
+
+                                          Book book = Book.withId(
+                                              int.parse(controller.text),
+                                              controller1.text,
+                                              controller2.text,
+                                              int.parse(controller3.text));
+                                          int success = await databasehandler
+                                              .insertData(book);
+                                          if (success == 0) {
+                                            print('not successful');
+                                          }
+                                          setState(() {});
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          "Confirm",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      )
+                                    ],
+                                  ),
+                                ));
+                      },
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.greenAccent,
+                      ),
+                    )),
+                drawer: Container(
+                  margin: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
+                  child: ListTileTheme(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    style: ListTileStyle.drawer,
+                    iconColor: Colors.greenAccent,
+                    textColor: Colors.white,
+                    contentPadding:
+                        const EdgeInsets.only(top: 20, bottom: 20, right: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: const EdgeInsets.only(bottom: 20),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Theme.of(context).primaryColorLight),
+                              image: const DecorationImage(
+                                  image: AssetImage("lib/photos/error.jpg")),
+                              borderRadius: BorderRadius.circular(20)),
+                        ),
+                        RichText(
+                            text: TextSpan(children: [
+                          TextSpan(
+                              text: "Kaung Zaw Thant\n",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold)),
+                          const TextSpan(
+                              text: "Level 1",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold))
+                        ])),
+                        ListTile(
+                          onTap: () {},
+                          leading: const Icon(
+                              FluentIcons.person_accounts_24_regular),
+                          title: const Text("My Account"),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          leading: const Icon(FluentIcons.history_24_regular),
+                          title: const Text("Pomodoro List"),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          leading: const Icon(FluentIcons.settings_24_regular),
+                          title: const Text("Settings"),
+                        ),
+                        ListTile(
+                          onTap: () {},
+                          leading:
+                              const Icon(FluentIcons.contact_card_24_regular),
+                          title: const Text("Contact Us"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ));
+          },
+        ));
   }
 }
 
@@ -50,87 +513,175 @@ class BookList extends StatefulWidget {
   _BookListState createState() => _BookListState();
 }
 
-class _BookListState extends State<BookList> {
+class _BookListState extends State<BookList> with TickerProviderStateMixin {
   TextEditingController hello = TextEditingController();
   DatabaseHandler databaseHandler = DatabaseHandler();
+
   @override
   void initState() {
     hello = TextEditingController();
+
     super.initState();
   }
 
+  bool pressed = false;
+  var key1 = GlobalKey<FormState>();
+  @override
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
-      child: Stack(
-        children: [
-          Positioned(
-            top: 10,
-            left: 10,
-            right: 10,
-            child: TextField(
-              decoration: InputDecoration(
-                  labelText: 'Search',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20))),
-              controller: hello,
-              keyboardType: TextInputType.text,
-              onSubmitted: (value) {
-                databaseHandler.search(value);
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Results(searchValue: value)));
-              },
+      padding: EdgeInsets.all(10),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Form(
+              key: key1,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: TextFormField(
+                  validator: ((String value) {
+                    if (value.isEmpty) {
+                      return 'Enter search value';
+                    }
+                    return null;
+                  }),
+                  enabled: pressed,
+                  decoration: pressed
+                      ? InputDecoration(
+                          isCollapsed: false,
+                          suffixIcon: Icon(
+                            Icons.search_outlined,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          labelText: 'Search',
+                          hintText: 'Enter book title',
+                          hintStyle: TextStyle(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          ))
+                      : InputDecoration(
+                          isCollapsed: false,
+                          suffixIcon: Icon(
+                            Icons.search_outlined,
+                            color: Colors.black,
+                            size: 16,
+                          ),
+                          hintText: 'Enter book title',
+                          hintStyle: TextStyle(
+                            color: Colors.black26,
+                            fontSize: 14,
+                          )),
+                  controller: hello,
+                  keyboardType: TextInputType.text,
+                  onTap: () {
+                    setState(() {
+                      pressed = true;
+                    });
+                  },
+                  onFieldSubmitted: (value) {
+                    databaseHandler.search(value);
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Results(searchValue: value)));
+                  },
+                ),
+              ),
             ),
-          ),
-          Positioned(
-            top: 70,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: FutureBuilder<List<Book>>(
-                future: databaseHandler.selectAllbooks(),
-                builder: (context, hello) => hello.connectionState !=
-                        ConnectionState.done
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : hello.data.length == 0
-                        ? Center(
-                            child: Text('NO DATA LEFT'),
-                          )
-                        : ListView.builder(
-                            itemCount: hello.data.length,
-                            itemBuilder: (BuildContext context, int value) {
-                              return Dismissible(
-                                key: Key(value.toString()),
-                                onDismissed: (direction) {
-                                  databaseHandler
-                                      .deleteData(hello.data[value].id);
-                                  hello.data.removeAt(value);
-                                  setState(() {});
-                                },
-                                child: Card(
-                                  child: ListTile(
-                                    title: Text(hello.data[value].book_name),
-                                    subtitle: Text(hello.data[value].author),
-                                    trailing: IconButton(
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () async {
-                                        await Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SecondPage(
-                                                      book: hello.data[value],
-                                                    )));
-                                        setState(() {});
-                                      },
+            Container(
+              margin: EdgeInsets.only(top: 20, bottom: 20),
+              width: size.width,
+              height: size.height,
+              child: FutureBuilder<List<Book>>(
+                  initialData: [],
+                  future: databaseHandler.selectAllbooks(),
+                  builder: (context, hello) => hello.connectionState !=
+                          ConnectionState.done
+                      ? Center(
+                          child: Column(
+                          children: [
+                            CircularProgressIndicator(
+                              color: Colors.black,
+                            ),
+                            Text("Loading",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold))
+                          ],
+                        ))
+                      : hello.data.length == 0
+                          ? Center(
+                              child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image(
+                                  image: AssetImage("lib/photos/error.jpg"),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Text("No Data",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 24,
+                                    ))
+                              ],
+                            ))
+                          : ListView.builder(
+                              itemCount: hello.data.length,
+                              itemBuilder: (BuildContext context, int value) {
+                                return Dismissible(
+                                  key: Key(value.toString()),
+                                  onDismissed: (direction) {
+                                    databaseHandler
+                                        .deleteData(hello.data[value].id);
+                                    hello.data.removeAt(value);
+                                    setState(() {});
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            bottomRight: Radius.circular(20))),
+                                    color: Colors.black,
+                                    child: ListTile(
+                                      title: Text(
+                                        hello.data[value].book_name,
+                                        style: TextStyle(
+                                            color: Colors.greenAccent,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Text(
+                                        hello.data[value].author,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      trailing: IconButton(
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () async {
+                                          await Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SecondPage(
+                                                        book: hello.data[value],
+                                                      )));
+                                          setState(() {});
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            })),
-          ),
-        ],
+                                );
+                              })),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -171,16 +722,15 @@ class _SecondPageState extends State<SecondPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
-        ),
-        title: Text(
-          'Add data',
-          style: TextStyle(color: Colors.white),
         ),
       ),
       backgroundColor: Colors.white,
@@ -282,10 +832,10 @@ class _SecondPageState extends State<SecondPage> {
                           controller2.text,
                           int.parse(controller3.text)));
                       Navigator.pop(context);
-                    
+
                       return;
                     }
-                    
+
                     Book book = Book.withId(
                         int.parse(controller.text),
                         controller1.text,
@@ -295,6 +845,7 @@ class _SecondPageState extends State<SecondPage> {
                     if (success == 0) {
                       print('not successful');
                     }
+                    setState(() {});
                   },
                   child: Text(
                     widget.book != null ? 'Update' : 'Save',
