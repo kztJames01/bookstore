@@ -121,19 +121,18 @@ class _SecondPageState extends State<SecondPage> {
                 onTap: () {
                   pressed = true;
                 },
-                decoration: pressed  ? InputDecoration(
+                decoration: pressed
+                    ? InputDecoration(
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(10)
-                        ),
+                            borderSide: BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(10)),
                         fillColor: Colors.white,
                         labelText: 'New Note',
                         labelStyle: TextStyle(color: Colors.black))
                     : InputDecoration(
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(10)
-                        ),
+                            borderSide: BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(10)),
                         hintText: "Enter New Note",
                         fillColor: Colors.white,
                         labelText: 'New Note',
@@ -159,18 +158,13 @@ class _SecondPageState extends State<SecondPage> {
                           widget.book.id,
                           controller1.text,
                           controller2.text,
-                          int.parse(controller3.text)));
+                          controller3.text));
                       Navigator.pop(context);
 
                       return;
                     }
 
-                    Book book = Book.withoutId(controller1.text,
-                        controller2.text, int.parse(controller3.text));
-                    int success = await databasehandler.insertData(book);
-                    if (success == 0) {
-                      print('not successful');
-                    }
+                    
                     setState(() {});
                   },
                   child: Text(

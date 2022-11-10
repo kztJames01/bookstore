@@ -45,9 +45,9 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                     if (value.isEmpty) {
                       return 'Enter search value';
                     }
-                    return null;
+                    return value;
                   }),
-                  enabled: pressed,
+             
                   decoration: pressed
                       ? InputDecoration(
                           isCollapsed: false,
@@ -94,16 +94,17 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
               width: size.width,
               height: size.height,
               child: FutureBuilder<List<Book>>(
-                  initialData: [],
                   future: databaseHandler.selectAllbooks(),
                   builder: (context, hello) => hello.connectionState !=
                           ConnectionState.done
                       ? Center(
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
                               color: Colors.black,
                             ),
+                            SizedBox(height: 20,),
                             Text("Loading",
                                 style: TextStyle(
                                     color: Colors.black,
@@ -111,10 +112,10 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                     fontWeight: FontWeight.bold))
                           ],
                         ))
-                      : hello.data.length == 0
-                          ? Center(
-                              child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                      : hello.data.isEmpty
+                          ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Image(
                                   image: AssetImage("lib/photos/error.jpg"),
@@ -122,13 +123,14 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                Text("No Data",
+                                Text("You have no notes",
                                     style: TextStyle(
                                       color: Colors.black,
+                                      fontWeight: FontWeight.bold,
                                       fontSize: 24,
                                     ))
                               ],
-                            ))
+                            )
                           : ListView.builder(
                               itemCount: hello.data.length,
                               itemBuilder: (BuildContext context, int value) {
@@ -148,14 +150,14 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                     color: Colors.black,
                                     child: ListTile(
                                       title: Text(
-                                        hello.data[value].book_name,
+                                        hello.data[value].noteTitle,
                                         style: TextStyle(
                                             color: Colors.greenAccent,
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold),
                                       ),
                                       subtitle: Text(
-                                        hello.data[value].author,
+                                        hello.data[value].category,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -163,7 +165,8 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                       ),
                                       trailing: IconButton(
                                         icon: Icon(
-                                          FluentIcons.text_edit_style_24_regular,
+                                          FluentIcons
+                                              .text_edit_style_24_regular,
                                           color: Colors.white,
                                         ),
                                         onPressed: () async {
