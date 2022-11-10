@@ -10,30 +10,19 @@ class DatabaseHandler {
   String COLUMN_NOTETITLE = 'noteTitle';
   String COLUMN_CATEGORY = 'category';
   String COLUMN_NOTE = 'note';
-  static Database _database;
-  static DatabaseHandler handler;
-  DatabaseHandler._createInstance();
-  factory DatabaseHandler() {
-    if (handler == null) {
-      handler = DatabaseHandler._createInstance();
-    }
-    return handler;
-  }
+  late Database _database;
+  late DatabaseHandler handler;
+  
 
   Future<Database> initdatabase() async {
     String dir = await getDatabasesPath();
     String path = join(dir, DBNAME);
     _database =
-        await openDatabase(path, version: 1, onCreate: (
-          (db, version) async {
-      
+        await openDatabase(path, version: 1, onCreate: ((db, version) async {
       String sql =
           'CREATE TABLE $TABLE_NAME($COLUMN_ID INTEGER PRIMARY KEY NOT NULL,$COLUMN_NOTETITLE TEXT NOT NULL,$COLUMN_CATEGORY TEXT NOT NULL,$COLUMN_NOTE TEXT NOT NULL)';
-     await db.execute(sql);
-
-    }
-    )
-    );
+      await db.execute(sql);
+    }));
     return _database;
   }
 

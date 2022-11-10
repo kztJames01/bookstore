@@ -5,14 +5,14 @@ import 'database_handler.dart';
 
 class Results extends StatefulWidget {
   final searchValue;
-  Results({Key key, this.searchValue}) : super(key: key);
+  Results({Key? key, this.searchValue}) : super(key: key);
 
   @override
   _ResultsState createState() => _ResultsState();
 }
 
 class _ResultsState extends State<Results> {
-  DatabaseHandler databaseHandler;
+  late DatabaseHandler databaseHandler;
   @override
   void initState() {
     databaseHandler = DatabaseHandler();
@@ -30,16 +30,16 @@ class _ResultsState extends State<Results> {
               builder: (context, snapshot) {
                 return snapshot.hasData
                     ? ListView.builder(
-                        itemCount: snapshot.data.length,
+                        itemCount: snapshot.data!.length,
                         itemBuilder: (BuildContext context, int value) {
                           return Card(
                               child: Container(
                             child: Column(
                               children: [
-                                Text(snapshot.data[value].id.toString()),
-                                Text(snapshot.data[value].noteTitle),
-                                Text(snapshot.data[value].category),
-                                Text(snapshot.data[value].note),
+                                Text(snapshot.data![value].id.toString()),
+                                Text(snapshot.data![value].noteTitle),
+                                Text(snapshot.data![value].category),
+                                Text(snapshot.data![value].note),
                               ],
                             ),
                           ));

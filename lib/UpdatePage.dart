@@ -5,7 +5,7 @@ import 'database_handler.dart';
 
 class SecondPage extends StatefulWidget {
   final Book book;
-  SecondPage({Key key, this.book}) : super(key: key);
+  SecondPage({Key? key, required this.book}) : super(key: key);
 
   @override
   _SecondPageState createState() => _SecondPageState();
@@ -18,7 +18,7 @@ class _SecondPageState extends State<SecondPage> {
   TextEditingController controller3 = TextEditingController();
   var key = GlobalKey<FormState>();
   bool pressed = false;
-  DatabaseHandler databasehandler;
+  late DatabaseHandler databasehandler;
   @override
   void initState() {
     super.initState();
@@ -65,7 +65,7 @@ class _SecondPageState extends State<SecondPage> {
               ),
               TextFormField(
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value!.isEmpty) {
                     return 'Enter New Note';
                   }
                   return null;
@@ -92,7 +92,7 @@ class _SecondPageState extends State<SecondPage> {
               ),
               TextFormField(
                 validator: (value) {
-                  if (value.isEmpty) {
+                  if (value!.isEmpty) {
                     return 'Enter Category';
                   }
                   return null;
@@ -150,7 +150,7 @@ class _SecondPageState extends State<SecondPage> {
                   height: 50,
                   color: Colors.black,
                   onPressed: () async {
-                    if (!key.currentState.validate()) {
+                    if (!key.currentState!.validate()) {
                       return;
                     }
                     if (widget.book != null) {

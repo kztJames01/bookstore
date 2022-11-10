@@ -1,13 +1,14 @@
 import 'package:bookstore/UpdatePage.dart';
 import 'package:bookstore/books.dart';
 import 'package:bookstore/database_handler.dart';
+import 'package:bookstore/notepage.dart';
 import 'package:bookstore/results.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import "package:flutter/material.dart";
 
 class BookList extends StatefulWidget {
   const BookList({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -41,39 +42,58 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: TextFormField(
-                  validator: ((String value) {
-                    if (value.isEmpty) {
-                      return 'Enter search value';
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                  validator: ((value) {
+                    if (value!.isEmpty) {
+                      return "Enter search value";
                     }
-                    return value;
+                    return null;
                   }),
-             
                   decoration: pressed
                       ? InputDecoration(
+                          contentPadding: EdgeInsets.only(bottom: 10, top: 20),
                           isCollapsed: false,
-                          suffixIcon: Icon(
-                            Icons.search_outlined,
-                            color: Colors.black,
-                            size: 20,
+                          suffixIcon: IconButton(
+                            padding: EdgeInsets.all(0),
+                            iconSize: 24,
+                            icon: Icon(
+                              Icons.search_outlined,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              databaseHandler.search(hello.text);
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      Results(searchValue: hello.text)));
+                            },
                           ),
                           labelText: 'Search',
-                          hintText: 'Enter book title',
+                          labelStyle: TextStyle(
+                              color: Colors.black38,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                          hintText: 'Enter note category',
                           hintStyle: TextStyle(
                             color: Colors.black26,
+                            fontStyle: FontStyle.italic,
                             fontSize: 14,
                           ))
                       : InputDecoration(
+                          contentPadding: EdgeInsets.only(bottom: 10, top: 20),
                           isCollapsed: false,
                           suffixIcon: Icon(
                             Icons.search_outlined,
                             color: Colors.black,
                             size: 16,
                           ),
-                          hintText: 'Enter book title',
+                          hintText: 'Enter note category',
                           hintStyle: TextStyle(
-                            color: Colors.black26,
-                            fontSize: 14,
-                          )),
+                              color: Colors.black26,
+                              fontSize: 14,
+                              fontStyle: FontStyle.italic)),
                   controller: hello,
                   keyboardType: TextInputType.text,
                   onTap: () {
@@ -82,9 +102,7 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                     });
                   },
                   onFieldSubmitted: (value) {
-                    databaseHandler.search(value);
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => Results(searchValue: value)));
+                    hello.text = value;
                   },
                 ),
               ),
@@ -99,12 +117,14 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                           ConnectionState.done
                       ? Center(
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
                               color: Colors.black,
                             ),
-                            SizedBox(height: 20,),
+                            SizedBox(
+                              height: 20,
+                            ),
                             Text("Loading",
                                 style: TextStyle(
                                     color: Colors.black,
@@ -112,9 +132,9 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                     fontWeight: FontWeight.bold))
                           ],
                         ))
-                      : hello.data.isEmpty
+                      : hello.data!.isEmpty
                           ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Image(
@@ -132,52 +152,68 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                               ],
                             )
                           : ListView.builder(
-                              itemCount: hello.data.length,
+                              itemCount: hello.data!.length,
                               itemBuilder: (BuildContext context, int value) {
                                 return Dismissible(
                                   key: Key(value.toString()),
                                   onDismissed: (direction) {
                                     databaseHandler
-                                        .deleteData(hello.data[value].id);
-                                    hello.data.removeAt(value);
+                                        .deleteData(hello.data![value].id);
+                                    hello.data!.removeAt(value);
                                     setState(() {});
                                   },
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(20),
-                                            bottomRight: Radius.circular(20))),
-                                    color: Colors.black,
-                                    child: ListTile(
-                                      title: Text(
-                                        hello.data[value].noteTitle,
-                                        style: TextStyle(
-                                            color: Colors.greenAccent,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      subtitle: Text(
-                                        hello.data[value].category,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => notePage(
+                                                    title: hello
+                                                        .data![value].noteTitle,
+                                                    category: hello
+                                                        .data![value].category,
+                                                    note:
+                                                        hello.data![value].note,
+                                                  )));
+                                    },
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              bottomRight:
+                                                  Radius.circular(20))),
+                                      color: Colors.black,
+                                      child: ListTile(
+                                        title: Text(
+                                          hello.data![value].noteTitle,
+                                          style: TextStyle(
+                                              color: Colors.greenAccent,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
                                         ),
-                                      ),
-                                      trailing: IconButton(
-                                        icon: Icon(
-                                          FluentIcons
-                                              .text_edit_style_24_regular,
-                                          color: Colors.white,
+                                        subtitle: Text(
+                                          hello.data![value].category,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                          ),
                                         ),
-                                        onPressed: () async {
-                                          await Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      SecondPage(
-                                                        book: hello.data[value],
-                                                      )));
-                                          setState(() {});
-                                        },
+                                        trailing: IconButton(
+                                          icon: Icon(
+                                            FluentIcons
+                                                .text_edit_style_24_regular,
+                                            color: Colors.white,
+                                          ),
+                                          onPressed: () async {
+                                            await Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SecondPage(
+                                                          book: hello
+                                                              .data![value],
+                                                        )));
+                                            setState(() {});
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ),

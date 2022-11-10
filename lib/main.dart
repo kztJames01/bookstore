@@ -12,7 +12,7 @@ void main() => runApp(Hi());
 
 class Hi extends StatefulWidget {
   const Hi({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -34,14 +34,14 @@ class _HiState extends State<Hi> {
 
 class Hello extends StatefulWidget {
   final Book book;
-  const Hello({Key key, this.book}) : super(key: key);
+  const Hello({Key? key, required this.book}) : super(key: key);
 
   @override
   State<Hello> createState() => _HelloState();
 }
 
 class _HelloState extends State<Hello> with TickerProviderStateMixin {
-  AdvancedDrawerController drawercontroller;
+  late AdvancedDrawerController drawercontroller;
 
   TextEditingController controller = TextEditingController();
   TextEditingController controller1 = TextEditingController();
@@ -49,7 +49,7 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
   TextEditingController controller3 = TextEditingController();
   var key = GlobalKey<FormState>();
   bool pressed = false;
-  DatabaseHandler databasehandler;
+  late DatabaseHandler databasehandler;
   @override
   void initState() {
     drawercontroller = AdvancedDrawerController();
@@ -325,7 +325,7 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             BorderRadius.circular(30)),
                                     color: Colors.black,
                                     onPressed: () async {
-                                      if (!key.currentState.validate()) {
+                                      if (!key.currentState!.validate()) {
                                         return;
                                       }
 
@@ -334,11 +334,29 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                           controller1.text,
                                           controller2.text,
                                           controller3.text);
-                                        await databasehandler.insertData(book);
-                                      setState(()  {
-                                        
-                                      });
-
+                                      int success = await databasehandler
+                                          .insertData(book);
+                                      if (success == 1) {
+                                        SnackBar(
+                                          width: size.width,
+                                          backgroundColor: Colors.black,
+                                          duration: Duration(seconds: 3),
+                                          margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(10),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                          content: Text(
+                                            'Success',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        );
+                                      }
+                                      setState(() {});
+                                      Navigator.of(context).pop();
                                     },
                                     child: Text(
                                       "Confirm",
@@ -426,80 +444,5 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                 ),
               ),
             )));
-  }
-}
-
-class CustomPicker extends CommonPickerModel {
-  String digits(int value, int length) {
-    return '$value'.padLeft(length, "0");
-  }
-
-  CustomPicker({DateTime currentTime, LocaleType locale})
-      : super(locale: locale) {
-    this.currentTime = currentTime ?? DateTime.now();
-    this.setLeftIndex(this.currentTime.hour);
-    this.setMiddleIndex(this.currentTime.minute);
-    this.setRightIndex(this.currentTime.second);
-  }
-
-  @override
-  String leftStringAtIndex(int index) {
-    if (index >= 0 && index < 24) {
-      return this.digits(index, 2);
-    } else {
-      return null;
-    }
-  }
-
-  @override
-  String middleStringAtIndex(int index) {
-    if (index >= 0 && index < 60) {
-      return this.digits(index, 2);
-    } else {
-      return null;
-    }
-  }
-
-  @override
-  String rightStringAtIndex(int index) {
-    if (index >= 0 && index < 60) {
-      return this.digits(index, 2);
-    } else {
-      return null;
-    }
-  }
-
-  @override
-  String leftDivider() {
-    return "|";
-  }
-
-  @override
-  String rightDivider() {
-    return "|";
-  }
-
-  @override
-  List<int> layoutProportions() {
-    return [1, 2, 1];
-  }
-
-  @override
-  DateTime finalTime() {
-    return currentTime.isUtc
-        ? DateTime.utc(
-            currentTime.year,
-            currentTime.month,
-            currentTime.day,
-            this.currentLeftIndex(),
-            this.currentMiddleIndex(),
-            this.currentRightIndex())
-        : DateTime(
-            currentTime.year,
-            currentTime.month,
-            currentTime.day,
-            this.currentLeftIndex(),
-            this.currentMiddleIndex(),
-            this.currentRightIndex());
   }
 }

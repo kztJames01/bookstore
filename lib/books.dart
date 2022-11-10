@@ -1,8 +1,8 @@
 class Book {
-  int id;
-  String noteTitle;
-  String category;
-  String note;
+  int id = 0;
+  String noteTitle = 'T';
+  String category = 'T';
+  String note = 'T';
   int get getId => id;
 
   set setId(int id) => this.id = id;
