@@ -142,8 +142,14 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                                 pressed = true;
                                               });
                                             },
+                                            validator: ((value) {
+                                              if (value!.isEmpty) {
+                                                return 'Enter ID';
+                                              }
+                                              return null;
+                                            }),
                                             onFieldSubmitted: ((value) =>
-                                                controller.text = value),
+                                                controller.text),
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 16,
@@ -185,8 +191,14 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                                 pressed = true;
                                               });
                                             },
+                                            validator: ((value) {
+                                              if (value!.isEmpty) {
+                                                return 'Enter Title';
+                                              }
+                                              return null;
+                                            }),
                                             onFieldSubmitted: ((value) =>
-                                                controller1.text = value),
+                                                controller1.text),
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 16,
@@ -228,8 +240,14 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                                 pressed = true;
                                               });
                                             },
+                                            validator: ((value) {
+                                              if (value!.isEmpty) {
+                                                return 'Enter Category';
+                                              }
+                                              return null;
+                                            }),
                                             onFieldSubmitted: ((value) =>
-                                                controller2.text = value),
+                                                controller2.text),
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 16,
@@ -274,9 +292,15 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             onTap: () {
                                               pressed = true;
                                             },
+                                            validator: ((value) {
+                                              if (value!.isEmpty) {
+                                                return 'Enter Note';
+                                              }
+                                              return null;
+                                            }),
                                             controller: controller3,
                                             onFieldSubmitted: ((value) =>
-                                                controller3.text = value),
+                                                controller3.text),
                                             decoration: pressed == false
                                                 ? InputDecoration(
                                                     border: OutlineInputBorder(
@@ -338,7 +362,7 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                           .insertData(book);
                                       if (success == 1) {
                                         SnackBar(
-                                          width: size.width,
+                                        
                                           backgroundColor: Colors.black,
                                           duration: Duration(seconds: 3),
                                           margin: EdgeInsets.all(10),

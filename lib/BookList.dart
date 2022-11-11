@@ -5,6 +5,7 @@ import 'package:bookstore/notepage.dart';
 import 'package:bookstore/results.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import "package:flutter/material.dart";
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class BookList extends StatefulWidget {
   const BookList({
@@ -155,12 +156,56 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                               itemCount: hello.data!.length,
                               itemBuilder: (BuildContext context, int value) {
                                 return Dismissible(
-                                  key: Key(value.toString()),
+                                  key: ValueKey<int>(hello.data![value].id),
                                   onDismissed: (direction) {
-                                    databaseHandler
-                                        .deleteData(hello.data![value].id);
-                                    hello.data!.removeAt(value);
-                                    setState(() {});
+                                    Alert(
+                                        context: context,
+                                        style: AlertStyle(
+                                            descStyle: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.greenAccent),
+                                            titleStyle: TextStyle(
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.greenAccent),
+                                            backgroundColor: Colors.black,
+                                            alertAlignment: Alignment.center),
+                                        title: "Alert",
+                                        desc: "Are you sure to delete this?",
+                                        buttons: [
+                                          DialogButton(
+                                              color: Colors.black,
+                                              child: Text(
+                                                "Dismiss",
+                                                style: TextStyle(
+                                                    color: Colors.greenAccent,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              onPressed: () {
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              }),
+                                          DialogButton(
+                                              color: Colors.black,
+                                              child: Text(
+                                                "Confirm",
+                                                style: TextStyle(
+                                                    color: Colors.greenAccent,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              onPressed: () {
+                                                databaseHandler.deleteData(
+                                                    hello.data![value].id);
+
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              })
+                                        ]).show();
                                   },
                                   child: GestureDetector(
                                     onTap: () {
