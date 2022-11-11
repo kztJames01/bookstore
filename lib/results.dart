@@ -1,17 +1,18 @@
+import 'package:bookstore/books.dart';
 import 'package:flutter/material.dart';
 
 import 'database_handler.dart';
 
 class Results extends StatefulWidget {
   final searchValue;
-  Results({Key key, this.searchValue}) : super(key: key);
+  Results({Key? key, this.searchValue}) : super(key: key);
 
   @override
   _ResultsState createState() => _ResultsState();
 }
 
 class _ResultsState extends State<Results> {
-  DatabaseHandler databaseHandler;
+  late DatabaseHandler databaseHandler;
   @override
   void initState() {
     databaseHandler = DatabaseHandler();
@@ -24,25 +25,30 @@ class _ResultsState extends State<Results> {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-          child: FutureBuilder(
-              initialData: [databaseHandler.selectAllbooks()],
+          child: FutureBuilder<List<Book>>(
               future: databaseHandler.selectSpecific(widget.searchValue),
               builder: (context, snapshot) {
-                return ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Card(
-                          child: Container(
-                        child: Column(
-                          children: [
-                            Text(snapshot.data[index].id.toString()),
-                            Text(snapshot.data[index].book_name),
-                            Text(snapshot.data[index].author),
-                            Text(snapshot.data[index].price.toString())
-                          ],
-                        ),
+                return snapshot.hasData
+                    ? ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (BuildContext context, int value) {
+                          return Card(
+                              child: Container(
+                            child: Column(
+                              children: [
+                                Text(snapshot.data![value].id.toString()),
+                                Text(snapshot.data![value].noteTitle),
+                                Text(snapshot.data![value].category),
+                                Text(snapshot.data![value].note),
+                              ],
+                            ),
+                          ));
+                        })
+                    : Center(
+                        child: Text(
+                        "No Data",
+                        style: TextStyle(color: Colors.black),
                       ));
-                    });
               })),
     );
   }
