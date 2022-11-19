@@ -59,17 +59,23 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
     controller2 = TextEditingController();
     controller3 = TextEditingController();
     databasehandler = DatabaseHandler();
-    if (widget.book != null) {
-      controller.text = widget.book.id.toString();
-      controller1.text = widget.book.noteTitle;
-      controller2.text = widget.book.category;
-      controller3.text = widget.book.note;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    late String strValue;
+    List<String> categoryList = [
+      "All",
+      "Lectures",
+      "Daily Notes",
+      "Passwords",
+      "Addresses",
+      "Random",
+      "Work",
+      "Rules"
+    ];
+    String initialData = categoryList[0];
     return Scaffold(
         body: AdvancedDrawer(
             childDecoration:
@@ -234,57 +240,49 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller1,
                                             keyboardType: TextInputType.text,
                                           ),
-                                          TextFormField(
-                                            onTap: () {
-                                              setState(() {
-                                                pressed = true;
-                                              });
-                                            },
-                                            validator: ((value) {
-                                              if (value!.isEmpty) {
-                                                return 'Enter Category';
-                                              }
-                                              return null;
-                                            }),
-                                            onFieldSubmitted: ((value) =>
-                                                controller2.text),
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                            decoration: pressed == true
-                                                ? InputDecoration(
-                                                    contentPadding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    labelText: "Category",
-                                                    labelStyle: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                    hintText:
-                                                        "Enter the category",
-                                                    hintStyle: const TextStyle(
-                                                        color: Colors.black12,
-                                                        fontSize: 16,
-                                                        fontStyle:
-                                                            FontStyle.italic),
-                                                  )
-                                                : const InputDecoration(
-                                                    contentPadding:
-                                                        EdgeInsets.all(10),
-                                                    hintText:
-                                                        "Enter the category",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.black12,
-                                                        fontSize: 16,
-                                                        fontStyle:
-                                                            FontStyle.italic),
-                                                  ),
-                                            controller: controller2,
-                                            keyboardType: TextInputType.text,
-                                          ),
+                                          DropdownButton(
+                                              dropdownColor: Colors.black,
+                                              menuMaxHeight: 40,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20)),
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                              icon: Icon(
+                                                FluentIcons.list_28_regular,
+                                                color: Colors.greenAccent,
+                                              ),
+                                              underline: Container(
+                                                height: 2,
+                                                width: 10,
+                                                decoration: BoxDecoration(
+                                                    color: Colors.greenAccent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0.5)),
+                                              ),
+                                              value: initialData,
+                                              items: categoryList.map<
+                                                      DropdownMenuItem<String>>(
+                                                  (String value) {
+                                                return DropdownMenuItem(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        strValue = value;
+                                                      });
+                                                    },
+                                                    value: value,
+                                                    child: Text(value));
+                                              }).toList(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  initialData =
+                                                      value.toString();
+                                                });
+                                              }),
                                           SizedBox(
                                             height: 20,
                                           ),
@@ -356,30 +354,30 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                       Book book = Book.withId(
                                           int.parse(controller.text),
                                           controller1.text,
-                                          controller2.text,
+                                          strValue,
                                           controller3.text);
-                                      int success = await databasehandler
-                                          .insertData(book);
-                                      if (success == 1) {
-                                        SnackBar(
-                                        
-                                          backgroundColor: Colors.black,
-                                          duration: Duration(seconds: 3),
-                                          margin: EdgeInsets.all(10),
-                                          padding: EdgeInsets.all(10),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          content: Text(
-                                            'Success',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        );
-                                      }
+                                      await databasehandler.insertData(book);
+
+                                      final snackbar = SnackBar(
+                                        backgroundColor: Colors.black,
+                                        duration: Duration(seconds: 3),
+                                        margin: EdgeInsets.all(10),
+                                        padding: EdgeInsets.all(10),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        content: Text(
+                                          'Note Added',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      );
+
                                       setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackbar);
                                       Navigator.of(context).pop();
                                     },
                                     child: Text(

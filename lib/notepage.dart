@@ -17,9 +17,12 @@ class notePage extends StatefulWidget {
 }
 
 class _notePageState extends State<notePage> {
+  List list = ["Important", "Bookmarked", ];
+  ScrollController controller = ScrollController();
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    String dropDownValue = "Important";
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.black,
@@ -34,20 +37,43 @@ class _notePageState extends State<notePage> {
               size: 32,
             ),
           )),
-      body: SingleChildScrollView(
-        child: Container(
-          width: size.width,
-          height: size.height * 0.9,
-          child: Stack(children: [
+      body: Container(
+        width: size.width,
+        height: size.height * 0.9,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            Positioned(
+              bottom: 0,
+              child: SingleChildScrollView(
+                controller: controller,
+                child: Container(
+                  width: size.width,
+                  height: size.height * 0.75,
+                  padding: EdgeInsets.only(
+                      top: size.height * 0.1, left: 10, right: 10),
+                  child: Text(
+                    widget.note,
+                    maxLines: 15,
+                    style: TextStyle(
+                        letterSpacing: 1.15,
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
                 top: 0,
                 child: Container(
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius:
                           BorderRadius.only(bottomLeft: Radius.circular(30))),
                   width: size.width,
-                  height: size.height * 0.3,
+                  height: size.height * 0.2,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -56,7 +82,7 @@ class _notePageState extends State<notePage> {
                         widget.title,
                         style: TextStyle(
                             color: Colors.greenAccent,
-                            fontSize: 24,
+                            fontSize: 26,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -67,51 +93,37 @@ class _notePageState extends State<notePage> {
                             fontWeight: FontWeight.bold),
                       ),
                       DropdownButton(
-                        onChanged: ((value) {}),
-                        dropdownColor: Colors.white,
-                        items: [
-                          DropdownMenuItem(
-                              child: Text(
-                            "To Do",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          )),
-                          DropdownMenuItem(
-                              child: Text(
-                            "Done",
-                            style: TextStyle(
+                          value: dropDownValue,
+                          icon: Icon(
+                            FluentIcons.list_28_regular,
+                            color: Colors.greenAccent,
+                          ),
+                          dropdownColor: Colors.black,
+                          underline: Container(
+                            height: 2,
+                            width: 10,
+                            decoration: BoxDecoration(
                                 color: Colors.greenAccent,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ))
-                        ],
-                      )
+                                borderRadius: BorderRadius.circular(0.5)),
+                          ),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic),
+                          items: [
+                            DropdownMenuItem(child: Text("Bookmarked")),
+                            DropdownMenuItem(child: Text("Important"))
+                          ],
+                          onChanged: ((value) {
+                            setState(() {
+                              dropDownValue = value!;
+                            });
+                          }))
                     ],
                   ),
                 )),
-            Positioned(
-              bottom: 0,
-              child: Container(
-                width: size.width,
-                height: size.height * 0.6,
-                color: Colors.white,
-                padding: EdgeInsets.all(15),
-                child: Text(
-                  widget.note,
-                  maxLines: 20,
-                  strutStyle: StrutStyle(height: 1.5),
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w300),
-                ),
-                
-              ),
-            )
-          ], alignment: AlignmentDirectional.centerStart),
-          
+          ],
         ),
       ),
     );
