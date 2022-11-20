@@ -64,18 +64,18 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    late String strValue;
-    List<String> categoryList = [
+    List<String> list = <String>[
       "All",
+      "Important",
       "Lectures",
-      "Daily Notes",
-      "Passwords",
+      "Transportation",
+      "Health",
+      "Politics",
       "Addresses",
-      "Random",
-      "Work",
-      "Rules"
+      "Passwords",
+      "Random"
     ];
-    String initialData = categoryList[0];
+    String dropdownValue = list.first;
     return Scaffold(
         body: AdvancedDrawer(
             childDecoration:
@@ -240,49 +240,7 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller1,
                                             keyboardType: TextInputType.text,
                                           ),
-                                          DropdownButton(
-                                              dropdownColor: Colors.black,
-                                              menuMaxHeight: 40,
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(20),
-                                                  bottomRight:
-                                                      Radius.circular(20)),
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                              icon: Icon(
-                                                FluentIcons.list_28_regular,
-                                                color: Colors.greenAccent,
-                                              ),
-                                              underline: Container(
-                                                height: 2,
-                                                width: 10,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.greenAccent,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            0.5)),
-                                              ),
-                                              value: initialData,
-                                              items: categoryList.map<
-                                                      DropdownMenuItem<String>>(
-                                                  (String value) {
-                                                return DropdownMenuItem(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        strValue = value;
-                                                      });
-                                                    },
-                                                    value: value,
-                                                    child: Text(value));
-                                              }).toList(),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  initialData =
-                                                      value.toString();
-                                                });
-                                              }),
+                                          DropDown(dropdownValue: dropdownValue, list: list),
                                           SizedBox(
                                             height: 20,
                                           ),
@@ -354,7 +312,7 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                       Book book = Book.withId(
                                           int.parse(controller.text),
                                           controller1.text,
-                                          strValue,
+                                          dropdownValue,
                                           controller3.text);
                                       await databasehandler.insertData(book);
 
@@ -466,5 +424,58 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                 ),
               ),
             )));
+  }
+}
+
+class DropDown extends StatefulWidget {
+  String dropdownValue;
+  List<String> list;
+  DropDown({super.key,required this.dropdownValue,required this.list});
+
+  @override
+  State<DropDown> createState() => _DropDownState();
+}
+
+class _DropDownState extends State<DropDown> {
+  @override
+  Widget build(BuildContext context) {
+    
+    return DropdownButton<String>(
+      value: widget.dropdownValue,
+      elevation: 16,
+      icon: Icon(
+        FluentIcons.list_28_regular,
+        color: Colors.black,
+      ),
+      dropdownColor: Colors.white,
+      underline: Container(
+        height: 2,
+        width: 10,
+        decoration: BoxDecoration(
+            color: Colors.greenAccent,
+            borderRadius: BorderRadius.circular(0.5)),
+      ),
+      iconDisabledColor: Colors.white,
+      iconEnabledColor: Colors.greenAccent,
+      isExpanded: true,
+      style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          fontStyle: FontStyle.italic),
+      items: widget.list.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+              style: TextStyle(color: Colors.black),
+            ));
+      }).toList(),
+      onChanged: (String? value) {
+        setState(() {
+          widget.dropdownValue = value!;
+        });
+      },
+    );
   }
 }

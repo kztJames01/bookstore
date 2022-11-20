@@ -17,12 +17,23 @@ class notePage extends StatefulWidget {
 }
 
 class _notePageState extends State<notePage> {
-  List list = ["Important", "Bookmarked", ];
+  List<String> list = <String>[
+    "All",
+    "Important",
+    "Lectures",
+    "Transportation",
+    "Health",
+    "Politics",
+    "Addresses",
+    "Passwords",
+    "Random"
+  ];
+
   ScrollController controller = ScrollController();
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    String dropDownValue = "Important";
+    String dropdownValue = list.first;
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.black,
@@ -93,33 +104,39 @@ class _notePageState extends State<notePage> {
                             fontWeight: FontWeight.bold),
                       ),
                       DropdownButton(
-                          value: dropDownValue,
-                          icon: Icon(
-                            FluentIcons.list_28_regular,
-                            color: Colors.greenAccent,
-                          ),
-                          dropdownColor: Colors.black,
-                          underline: Container(
-                            height: 2,
-                            width: 10,
-                            decoration: BoxDecoration(
-                                color: Colors.greenAccent,
-                                borderRadius: BorderRadius.circular(0.5)),
-                          ),
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic),
-                          items: [
-                            DropdownMenuItem(child: Text("Bookmarked")),
-                            DropdownMenuItem(child: Text("Important"))
-                          ],
-                          onChanged: ((value) {
-                            setState(() {
-                              dropDownValue = value!;
-                            });
-                          }))
+                        value: dropdownValue,
+                        elevation: 16,
+                        icon: Icon(
+                          FluentIcons.list_28_regular,
+                          color: Colors.black,
+                        ),
+                        dropdownColor: Colors.black,
+                        underline: Container(
+                          height: 2,
+                          width: 10,
+                          decoration: BoxDecoration(
+                              color: Colors.greenAccent,
+                              borderRadius: BorderRadius.circular(0.5)),
+                        ),
+                        iconDisabledColor: Colors.white,
+                        iconEnabledColor: Colors.greenAccent,
+                        isExpanded: true,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic),
+                        onChanged: (String? value) {
+                          setState(() {
+                            dropdownValue = value!;
+                          });
+                        },
+                        items: list.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem(
+                              value: value, child: Text(value,style: TextStyle(color: Colors.black),));
+                        }).toList(),
+                        
+                      )
                     ],
                   ),
                 )),
