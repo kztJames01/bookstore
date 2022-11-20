@@ -33,6 +33,8 @@ dependencies:
   flutter_advanced_drawer: ^1.3.2
   fluentui_system_icons: ^1.1.185
   rflutter_alert: ^2.0.4
+  bloc: ^8.1.0
+  flutter_bloc: ^8.1.1
 
 dev_dependencies:
   flutter_test:
