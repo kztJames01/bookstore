@@ -10,3 +10,11 @@ class DropDownCubit extends Cubit<DropDownInitial> {
     emit(DropDownInitial(value: state.value = textValue));
   }
 }
+
+class DropDownCubit1 extends Cubit<DropDownInitial1> {
+  DropDownCubit1() : super(DropDownInitial1(textValue: "All"));
+
+  change1(value) {
+    emit(DropDownInitial1(textValue: state.textValue = value));
+  }
+}

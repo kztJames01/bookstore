@@ -214,10 +214,7 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                               builder: (context) => notePage(
                                                     title: hello
                                                         .data![value].noteTitle,
-                                                    category: hello
-                                                        .data![value].category,
-                                                    note:
-                                                        hello.data![value].note,
+                                                   
                                                   )));
                                     },
                                     child: Card(

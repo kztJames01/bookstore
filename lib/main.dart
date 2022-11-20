@@ -34,8 +34,11 @@ class Hi extends StatefulWidget {
 class _HiState extends State<Hi> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DropDownCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => DropDownCubit(),),
+        BlocProvider(create: (context)=> DropDownCubit1())
+      ],
       child: MaterialApp(
         title: "Notes",
         debugShowCheckedModeBanner: false,
