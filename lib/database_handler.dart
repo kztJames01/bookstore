@@ -54,7 +54,7 @@ class DatabaseHandler {
   Future<List<Book>> selectSpecific(String book) async {
     await initdatabase();
     var result = await _database
-        .query(TABLE_NAME, where: 'noteTitle = ?', whereArgs: [book]);
+        .query(TABLE_NAME, where: '$COLUMN_CATEGORY = ?', whereArgs: [book]);
 
     List<Book> specific = result.map((e) => Book.fromMap(e)).toList();
     return specific;

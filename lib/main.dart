@@ -1,14 +1,26 @@
 import 'package:bookstore/BookList.dart';
 import 'package:bookstore/books.dart';
+import 'package:bookstore/cubit/drop_down_cubit.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:bookstore/database_handler.dart';
-import 'package:bookstore/results.dart';
+
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 void main() => runApp(Hi());
+List<String> list = <String>[
+  "All",
+  "Important",
+  "Lectures",
+  "Transportation",
+  "Health",
+  "Politics",
+  "Addresses",
+  "Passwords",
+  "Random"
+];
+String dropdownValue = list.first;
 
 class Hi extends StatefulWidget {
   const Hi({
@@ -22,11 +34,19 @@ class Hi extends StatefulWidget {
 class _HiState extends State<Hi> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Notes",
-      debugShowCheckedModeBanner: false,
-      home: Hello(
-        book: Book(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => DropDownCubit(),
+        ),
+        BlocProvider(create: (context) => DropDownCubit1())
+      ],
+      child: MaterialApp(
+        title: "Notes",
+        debugShowCheckedModeBanner: false,
+        home: Hello(
+          book: Book(),
+        ),
       ),
     );
   }
@@ -59,17 +79,12 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
     controller2 = TextEditingController();
     controller3 = TextEditingController();
     databasehandler = DatabaseHandler();
-    if (widget.book != null) {
-      controller.text = widget.book.id.toString();
-      controller1.text = widget.book.noteTitle;
-      controller2.text = widget.book.category;
-      controller3.text = widget.book.note;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+
     return Scaffold(
         body: AdvancedDrawer(
             childDecoration:
@@ -234,56 +249,68 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller1,
                                             keyboardType: TextInputType.text,
                                           ),
-                                          TextFormField(
-                                            onTap: () {
-                                              setState(() {
-                                                pressed = true;
-                                              });
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          BlocBuilder<DropDownCubit,
+                                              DropDownInitial>(
+                                            builder: (context, state) {
+                                              return Container(
+                                                width: size.width * 0.9,
+                                                height: size.height * 0.05,
+                                                padding: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.black,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20)),
+                                                child: DropdownButton<String>(
+                                                    borderRadius: BorderRadius
+                                                        .only(
+                                                            topLeft: Radius
+                                                                .circular(20),
+                                                            bottomRight: Radius
+                                                                .circular(20)),
+                                                    value: state.value,
+                                                    elevation: 16,
+                                                    icon: Icon(
+                                                      FluentIcons
+                                                          .arrow_circle_down_24_regular,
+                                                    ),
+                                                    dropdownColor: Colors.black,
+                                                    iconDisabledColor:
+                                                        Colors.white,
+                                                    iconEnabledColor:
+                                                        Colors.greenAccent,
+                                                    isExpanded: true,
+                                                    style:
+                                                        TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                    items: list.map<
+                                                            DropdownMenuItem<
+                                                                String>>(
+                                                        (String value) {
+                                                      return DropdownMenuItem<
+                                                              String>(
+                                                          value: value,
+                                                          child: Text(
+                                                            value,
+                                                          ));
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      BlocProvider.of<
+                                                                  DropDownCubit>(
+                                                              context)
+                                                          .change(value);
+                                                      dropdownValue = value!;
+                                                    }),
+                                              );
                                             },
-                                            validator: ((value) {
-                                              if (value!.isEmpty) {
-                                                return 'Enter Category';
-                                              }
-                                              return null;
-                                            }),
-                                            onFieldSubmitted: ((value) =>
-                                                controller2.text),
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                            decoration: pressed == true
-                                                ? InputDecoration(
-                                                    contentPadding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    labelText: "Category",
-                                                    labelStyle: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                    hintText:
-                                                        "Enter the category",
-                                                    hintStyle: const TextStyle(
-                                                        color: Colors.black12,
-                                                        fontSize: 16,
-                                                        fontStyle:
-                                                            FontStyle.italic),
-                                                  )
-                                                : const InputDecoration(
-                                                    contentPadding:
-                                                        EdgeInsets.all(10),
-                                                    hintText:
-                                                        "Enter the category",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.black12,
-                                                        fontSize: 16,
-                                                        fontStyle:
-                                                            FontStyle.italic),
-                                                  ),
-                                            controller: controller2,
-                                            keyboardType: TextInputType.text,
                                           ),
                                           SizedBox(
                                             height: 20,
@@ -301,15 +328,19 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller3,
                                             onFieldSubmitted: ((value) =>
                                                 controller3.text),
-                                            decoration: pressed == false
+                                            decoration: pressed 
                                                 ? InputDecoration(
                                                     border: OutlineInputBorder(
                                                         borderSide: BorderSide(
                                                             color:
                                                                 Colors.black12),
-                                                        borderRadius: BorderRadius.circular(
-                                                            10)),
-                                                    fillColor: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
+                                                    hintText: "Enter Notes",
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.black38,
+                                                        fontSize: 20),
                                                     labelText: 'Note',
                                                     labelStyle: TextStyle(
                                                         fontSize: 16,
@@ -321,16 +352,13 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                                         borderSide: BorderSide(
                                                             color:
                                                                 Colors.black12),
-                                                        borderRadius: BorderRadius.circular(
-                                                            10)),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
                                                     hintText: "Enter Notes",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.black12,
-                                                        fontSize: 16,
-                                                        fontStyle: FontStyle.italic),
-                                                    fillColor: Colors.white,
-                                                    labelText: 'Notes',
-                                                    labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)),
+                                                    hintStyle: TextStyle(color: Colors.black12, fontSize: 16, fontStyle: FontStyle.italic),
+                                                
+                                                   ),
                                             keyboardType:
                                                 TextInputType.multiline,
                                             maxLines: 17,
@@ -356,30 +384,12 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                       Book book = Book.withId(
                                           int.parse(controller.text),
                                           controller1.text,
-                                          controller2.text,
+                                          dropdownValue,
                                           controller3.text);
-                                      int success = await databasehandler
-                                          .insertData(book);
-                                      if (success == 1) {
-                                        SnackBar(
-                                        
-                                          backgroundColor: Colors.black,
-                                          duration: Duration(seconds: 3),
-                                          margin: EdgeInsets.all(10),
-                                          padding: EdgeInsets.all(10),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          content: Text(
-                                            'Success',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        );
-                                      }
+                                      await databasehandler.insertData(book);
+
                                       setState(() {});
+
                                       Navigator.of(context).pop();
                                     },
                                     child: Text(
@@ -458,11 +468,6 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                       onTap: () {},
                       leading: const Icon(FluentIcons.settings_24_regular),
                       title: const Text("Settings"),
-                    ),
-                    ListTile(
-                      onTap: () {},
-                      leading: const Icon(FluentIcons.contact_card_24_regular),
-                      title: const Text("Contact Us"),
                     ),
                   ],
                 ),

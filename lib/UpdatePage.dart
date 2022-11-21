@@ -1,7 +1,13 @@
 import 'package:bookstore/books.dart';
+import 'package:bookstore/cubit/drop_down_cubit.dart';
+import 'package:bookstore/main.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'database_handler.dart';
+
+String _dropDownValue = "All";
 
 class SecondPage extends StatefulWidget {
   final Book book;
@@ -10,6 +16,18 @@ class SecondPage extends StatefulWidget {
   @override
   _SecondPageState createState() => _SecondPageState();
 }
+
+List<String> list = <String>[
+  "All",
+  "Important",
+  "Lectures",
+  "Transportation",
+  "Health",
+  "Politics",
+  "Addresses",
+  "Passwords",
+  "Random"
+];
 
 class _SecondPageState extends State<SecondPage> {
   TextEditingController controller = TextEditingController();
@@ -31,6 +49,7 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -78,65 +97,102 @@ class _SecondPageState extends State<SecondPage> {
                 onFieldSubmitted: (value) => controller1.text,
                 decoration: pressed
                     ? InputDecoration(
-                        fillColor: Colors.white,
                         labelText: 'New Title',
-                        labelStyle: TextStyle(color: Colors.black))
+                        labelStyle: TextStyle(
+                            color: Colors.black,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                        hintText: "Enter New Title",
+                        hintStyle: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 16,
+                        ))
                     : InputDecoration(
                         hintText: "Enter New Title",
-                        fillColor: Colors.white,
-                        labelText: 'New Title',
-                        labelStyle: TextStyle(color: Colors.black)),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Enter Category';
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.text,
-                controller: controller2,
-                onTap: () {
-                  pressed = true;
-                },
-                onFieldSubmitted: (value) => controller2.text,
-                decoration: pressed
-                    ? InputDecoration(
-                        fillColor: Colors.white,
-                        labelText: 'New Category',
-                        labelStyle: TextStyle(color: Colors.black))
-                    : InputDecoration(
-                        hintText: "Enter New Category",
-                        fillColor: Colors.white,
-                        labelText: 'New Category',
-                        labelStyle: TextStyle(color: Colors.black)),
+                        hintStyle: TextStyle(
+                          color: Colors.black38,
+                          fontSize: 16,
+                        )),
               ),
               SizedBox(
                 height: 20,
               ),
-              TextField(
+              BlocBuilder<DropDownCubit1, DropDownInitial1>(
+                builder: (context, state) {
+                  return Container(
+                    width: size.width * 0.8,
+                    height: size.height * 0.05,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: DropdownButton<String>(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20)),
+                        value: state.textValue,
+                        elevation: 16,
+                        icon: Icon(
+                          FluentIcons.arrow_circle_down_24_regular,
+                        ),
+                        dropdownColor: Colors.black,
+                        iconDisabledColor: Colors.white,
+                        iconEnabledColor: Colors.greenAccent,
+                        isExpanded: true,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic),
+                        items:
+                            list.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                              ));
+                        }).toList(),
+                        onChanged: (value) {
+                          BlocProvider.of<DropDownCubit1>(context)
+                              .change1(value);
+                          _dropDownValue = value!;
+                        }),
+                  );
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              TextFormField(
                 onTap: () {
                   pressed = true;
+                },
+                controller: controller3,
+                onFieldSubmitted: (value) {
+                  controller3.text;
                 },
                 decoration: pressed
                     ? InputDecoration(
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black12),
                             borderRadius: BorderRadius.circular(10)),
-                        fillColor: Colors.white,
-                        labelText: 'New Note',
-                        labelStyle: TextStyle(color: Colors.black))
+                        labelText: "New Note",
+                        labelStyle: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 20),
+                        hintText: 'Enter New Note',
+                        hintStyle:
+                            TextStyle(color: Colors.black38, fontSize: 20))
                     : InputDecoration(
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black12),
                             borderRadius: BorderRadius.circular(10)),
                         hintText: "Enter New Note",
-                        fillColor: Colors.white,
-                        labelText: 'New Note',
-                        labelStyle: TextStyle(color: Colors.black)),
+                        hintStyle:
+                            TextStyle(color: Colors.black38, fontSize: 20)),
                 keyboardType: TextInputType.multiline,
                 maxLines: 17,
                 maxLength: 1500,
@@ -155,16 +211,13 @@ class _SecondPageState extends State<SecondPage> {
                     }
                     if (widget.book != null) {
                       await databasehandler.updateData(Book.withId(
-                          widget.book.id,
-                          controller1.text,
-                          controller2.text,
-                          controller3.text));
+                        widget.book.id,
+                          controller1.text, _dropDownValue, controller3.text));
                       Navigator.pop(context);
 
                       return;
                     }
 
-                    
                     setState(() {});
                   },
                   child: Text(
