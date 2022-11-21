@@ -3,6 +3,7 @@ import 'package:bookstore/books.dart';
 import 'package:bookstore/database_handler.dart';
 import 'package:bookstore/notepage.dart';
 import 'package:bookstore/results.dart';
+import 'package:bookstore/searchList.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import "package:flutter/material.dart";
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -28,6 +29,7 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
   }
 
   bool pressed = false;
+  bool search = false;
   var key1 = GlobalKey<FormState>();
   @override
   @override
@@ -65,10 +67,8 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                               color: Colors.black,
                             ),
                             onPressed: () {
-                              databaseHandler.search(hello.text);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      Results(searchValue: hello.text)));
+                              search = true;
+                              
                             },
                           ),
                           labelText: 'Search',
@@ -103,7 +103,7 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                     });
                   },
                   onFieldSubmitted: (value) {
-                    hello.text = value;
+                    hello.text;
                   },
                 ),
               ),
@@ -112,7 +112,8 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
               margin: EdgeInsets.only(top: 20, bottom: 20),
               width: size.width,
               height: size.height,
-              child: FutureBuilder<List<Book>>(
+              child: search ? Search(category: hello.text,pressed: search,):
+              FutureBuilder<List<Book>>(
                   future: databaseHandler.selectAllbooks(),
                   builder: (context, hello) => hello.connectionState !=
                           ConnectionState.done
@@ -214,7 +215,6 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                               builder: (context) => notePage(
                                                     title: hello
                                                         .data![value].noteTitle,
-                                                   
                                                   )));
                                     },
                                     child: Card(

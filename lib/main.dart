@@ -36,8 +36,10 @@ class _HiState extends State<Hi> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => DropDownCubit(),),
-        BlocProvider(create: (context)=> DropDownCubit1())
+        BlocProvider(
+          create: (context) => DropDownCubit(),
+        ),
+        BlocProvider(create: (context) => DropDownCubit1())
       ],
       child: MaterialApp(
         title: "Notes",
@@ -247,60 +249,67 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller1,
                                             keyboardType: TextInputType.text,
                                           ),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
                                           BlocBuilder<DropDownCubit,
                                               DropDownInitial>(
                                             builder: (context, state) {
-                                              return DropdownButton<String>(
-                                                  value: state.value,
-                                                  elevation: 16,
-                                                  icon: Icon(
-                                                    FluentIcons.list_28_regular,
+                                              return Container(
+                                                width: size.width * 0.9,
+                                                height: size.height * 0.05,
+                                                padding: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
                                                     color: Colors.black,
-                                                  ),
-                                                  dropdownColor: Colors.white,
-                                                  underline: Container(
-                                                    height: 2,
-                                                    width: 10,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            Colors.greenAccent,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(0.5)),
-                                                  ),
-                                                  iconDisabledColor:
-                                                      Colors.white,
-                                                  iconEnabledColor:
-                                                      Colors.greenAccent,
-                                                  isExpanded: true,
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FontStyle.italic),
-                                                  items: list.map<
-                                                          DropdownMenuItem<
-                                                              String>>(
-                                                      (String value) {
-                                                    return DropdownMenuItem<
-                                                            String>(
-                                                        value: value,
-                                                        child: Text(
-                                                          value,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black),
-                                                        ));
-                                                  }).toList(),
-                                                  onChanged: (value) {
-                                                    BlocProvider.of<
-                                                                DropDownCubit>(
-                                                            context)
-                                                        .change(value);
-                                                    dropdownValue = value!;
-                                                  });
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20)),
+                                                child: DropdownButton<String>(
+                                                    borderRadius: BorderRadius
+                                                        .only(
+                                                            topLeft: Radius
+                                                                .circular(20),
+                                                            bottomRight: Radius
+                                                                .circular(20)),
+                                                    value: state.value,
+                                                    elevation: 16,
+                                                    icon: Icon(
+                                                      FluentIcons
+                                                          .arrow_circle_down_24_regular,
+                                                    ),
+                                                    dropdownColor: Colors.black,
+                                                    iconDisabledColor:
+                                                        Colors.white,
+                                                    iconEnabledColor:
+                                                        Colors.greenAccent,
+                                                    isExpanded: true,
+                                                    style:
+                                                        TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                    items: list.map<
+                                                            DropdownMenuItem<
+                                                                String>>(
+                                                        (String value) {
+                                                      return DropdownMenuItem<
+                                                              String>(
+                                                          value: value,
+                                                          child: Text(
+                                                            value,
+                                                          ));
+                                                    }).toList(),
+                                                    onChanged: (value) {
+                                                      BlocProvider.of<
+                                                                  DropDownCubit>(
+                                                              context)
+                                                          .change(value);
+                                                      dropdownValue = value!;
+                                                    }),
+                                              );
                                             },
                                           ),
                                           SizedBox(
@@ -319,15 +328,19 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller3,
                                             onFieldSubmitted: ((value) =>
                                                 controller3.text),
-                                            decoration: pressed == false
+                                            decoration: pressed 
                                                 ? InputDecoration(
                                                     border: OutlineInputBorder(
                                                         borderSide: BorderSide(
                                                             color:
                                                                 Colors.black12),
-                                                        borderRadius: BorderRadius.circular(
-                                                            10)),
-                                                    fillColor: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
+                                                    hintText: "Enter Notes",
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.black38,
+                                                        fontSize: 20),
                                                     labelText: 'Note',
                                                     labelStyle: TextStyle(
                                                         fontSize: 16,
@@ -339,16 +352,13 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                                         borderSide: BorderSide(
                                                             color:
                                                                 Colors.black12),
-                                                        borderRadius: BorderRadius.circular(
-                                                            10)),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
                                                     hintText: "Enter Notes",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.black12,
-                                                        fontSize: 16,
-                                                        fontStyle: FontStyle.italic),
-                                                    fillColor: Colors.white,
-                                                    labelText: 'Notes',
-                                                    labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)),
+                                                    hintStyle: TextStyle(color: Colors.black12, fontSize: 16, fontStyle: FontStyle.italic),
+                                                
+                                                   ),
                                             keyboardType:
                                                 TextInputType.multiline,
                                             maxLines: 17,
