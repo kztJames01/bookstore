@@ -9,3 +9,8 @@ class DropDownInitial1 {
   String textValue;
   DropDownInitial1({required this.textValue});
 }
+
+class searchResult {
+  bool search;
+  searchResult({required this.search});
+}
