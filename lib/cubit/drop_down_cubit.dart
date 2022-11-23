@@ -26,3 +26,11 @@ class searchCubit2 extends Cubit<searchResult> {
     emit(searchResult(search: state.search = value));
   }
 }
+
+class edit extends Cubit<textEdit> {
+  edit() : super(textEdit(edit: false));
+
+  change(value) {
+    emit(textEdit(edit: state.edit = value));
+  }
+}

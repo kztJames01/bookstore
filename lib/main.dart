@@ -40,7 +40,8 @@ class _HiState extends State<Hi> {
           create: (context) => DropDownCubit(),
         ),
         BlocProvider(create: (context) => DropDownCubit1()),
-        BlocProvider(create: (context)=> searchCubit2())
+        BlocProvider(create: (context)=> searchCubit2()),
+        BlocProvider(create: (context)=> edit())
       ],
       child: MaterialApp(
         title: "Notes",

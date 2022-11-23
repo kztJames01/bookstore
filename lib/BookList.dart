@@ -245,7 +245,7 @@ class _BookListState extends State<BookList> with TickerProviderStateMixin {
                                                           notePage(
                                                             title: hello
                                                                 .data![value]
-                                                                .noteTitle,
+                                                                
                                                           )));
                                             },
                                             child: Card(

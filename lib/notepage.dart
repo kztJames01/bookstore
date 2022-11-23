@@ -1,10 +1,12 @@
 import 'package:bookstore/books.dart';
+import 'package:bookstore/cubit/drop_down_cubit.dart';
 import 'package:bookstore/database_handler.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class notePage extends StatefulWidget {
-  String title;
+  final Book title;
 
   notePage({
     Key? key,
@@ -16,49 +18,89 @@ class notePage extends StatefulWidget {
 }
 
 class _notePageState extends State<notePage> {
+  late TextEditingController _controller;
   DatabaseHandler handler = DatabaseHandler();
   ScrollController controller = ScrollController();
   int index = 0;
+  bool isEditable = false;
+  late String initialText;
+  static GlobalKey<FormState> key = new GlobalKey<FormState>();
+  @override
+  void initState() {
+    initialText = widget.title.note;
+    _controller = TextEditingController.fromValue(
+        TextEditingValue(text: widget.title.note));
+    // TODO: implement initState
+    super.initState();
+  }
+
+  Widget _editText(bool isEditable) {
+    return isEditable
+        ? TextFormField(
+          key: key,
+            onFieldSubmitted: (value) {
+              _controller.text;
+            },
+            controller: _controller,
+            keyboardType: TextInputType.multiline,
+            maxLines: 20,
+            maxLength: 2000,
+            style: TextStyle(
+                letterSpacing: 1.15,
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500),
+          )
+        : Text(
+            widget.title.note,
+            style: TextStyle(
+                letterSpacing: 1.15,
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500),
+          );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: Icon(
-              FluentIcons.arrow_circle_left_32_regular,
-              color: Colors.greenAccent,
-              size: 32,
-            ),
-          )),
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 32,
+          ),
+        ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                BlocProvider.of<edit>(context).change(true);
+              },
+              icon: Icon(
+                FluentIcons.edit_28_regular,
+                color: Colors.white,
+              ))
+        ],
+      ),
       body: FutureBuilder<List<Book>>(
-          future: handler.search(widget.title),
+          future: handler.search(widget.title.noteTitle),
           builder: (context, snapshot) {
-            return snapshot.connectionState != ConnectionState.done
-                ? Container(
-                    width: size.width,
-                    height: size.height * 0.9,
-                    color: Colors.black,
-                    child: Column(children: [
-                      CircularProgressIndicator(
-                        color: Colors.white,
-                        backgroundColor: Colors.greenAccent,
-                        strokeWidth: 4,
-                      ),
-                      Text("Loading",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold))
-                    ]),
-                  )
-                : Container(
+            return  Container(
                     width: size.width,
                     height: size.height * 0.9,
                     child: Stack(
@@ -66,29 +108,24 @@ class _notePageState extends State<notePage> {
                       children: [
                         Positioned(
                           bottom: 0,
-                          child: SingleChildScrollView(
-                            controller: controller,
-                            child: Container(
-                              width: size.width,
-                              height: size.height * 0.75,
-                              padding: EdgeInsets.only(
-                                  top: size.height * 0.1, left: 10, right: 10),
-                              child: Text(
-                                snapshot.data![index].note,
-                                maxLines: 15,
-                                style: TextStyle(
-                                    letterSpacing: 1.15,
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
+                          child: BlocBuilder<edit, textEdit>(
+                            builder: (context, state) {
+                              return Container(
+                                  width: size.width,
+                                  height: size.height * 0.75,
+                                  padding: EdgeInsets.only(
+                                      top: size.height * 0.1,
+                                      left: 10,
+                                      right: 10),
+                                  child: _editText(state.edit));
+                            },
                           ),
                         ),
                         Positioned(
                             top: 0,
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20,vertical: 0),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 0),
                               decoration: BoxDecoration(
                                   color: Colors.black,
                                   borderRadius: BorderRadius.only(
@@ -101,7 +138,7 @@ class _notePageState extends State<notePage> {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Text(
-                                    "Title: ${widget.title}",
+                                    "Title: ${widget.title.noteTitle}",
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -110,7 +147,7 @@ class _notePageState extends State<notePage> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    "Category: ${snapshot.data![index].category}",
+                                    "Category: ${widget.title.category}",
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,

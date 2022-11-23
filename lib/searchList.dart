@@ -49,6 +49,30 @@ class _SearchState extends State<Search> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    BlocProvider.of<searchCubit2>(context)
+                                        .change(false);
+                                  },
+                                  icon: Icon(
+                                      FluentIcons.arrow_circle_left_24_regular,
+                                      color: Colors.greenAccent)),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "Search Results",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic),
+                              )
+                            ],
+                          ),
+                        SizedBox(height: 20),
                         Image(
                           image: AssetImage("lib/photos/error.jpg"),
                         ),
@@ -156,7 +180,7 @@ class _SearchState extends State<Search> {
                                           .push(MaterialPageRoute(
                                               builder: (context) => notePage(
                                                     title: snapshot
-                                                        .data![value].noteTitle,
+                                                        .data![value]
                                                   )));
                                     },
                                     child: Card(
