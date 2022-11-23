@@ -1,33 +1,34 @@
 class Book {
-  int id;
-  String book_name;
-  String author;
-  int price;
- int get getId => id;
+  int id = 0;
+  String noteTitle = 'T';
+  String category = 'T';
+  String note = 'T';
+  int get getId => id;
 
- set setId(int id) => this.id = id;
+  set setId(int id) => this.id = id;
 
- String get bookname => book_name;
+  String get gettitle => noteTitle;
 
- set bookname(String value) => book_name = value;
+  set setTitle(String noteTitle) => this.noteTitle = noteTitle;
 
- String get getAuthor => author;
+  String get getcategory => category;
 
- set setAuthor(String author) => this.author = author;
+  set setcategory(String category) => this.category = category;
 
- int get getPrice => price;
+  String get getNote => note;
 
- set setPrice(int price) => this.price = price;
+  set setNote(String note) => this.note = note;
+
   Book();
-  Book.withId(this.id, this.book_name, this.author, this.price);
-  Book.withoutId(this.book_name, this.author, this.price);
+  Book.withId(this.id, this.noteTitle, this.category, this.note);
+  Book.withoutId(this.noteTitle, this.category, this.note);
 
   Map<String, dynamic> toMap() =>
-      {'id': id, 'book_name': book_name, 'author': author, 'price': price};
+      {'id': id, 'noteTitle': noteTitle, 'category': category, 'note': note};
   Book.fromMap(Map<String, dynamic> map) {
     id = map['id'];
-    book_name = map['book_name'];
-    author = map['author'];
-    price = map['price'];
+    noteTitle = map['noteTitle'];
+    category = map['category'];
+    note = map['note'];
   }
 }
