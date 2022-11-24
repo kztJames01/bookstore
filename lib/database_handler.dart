@@ -1,3 +1,4 @@
+import 'package:azlistview/azlistview.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -12,7 +13,6 @@ class DatabaseHandler {
   String COLUMN_NOTE = 'note';
   late Database _database;
   late DatabaseHandler handler;
-  
 
   Future<Database> initdatabase() async {
     String dir = await getDatabasesPath();
@@ -50,6 +50,7 @@ class DatabaseHandler {
     List<Book> allbooks = result.map((e) => Book.fromMap(e)).toList();
     return allbooks;
   }
+
 
   Future<List<Book>> selectSpecific(String book) async {
     await initdatabase();

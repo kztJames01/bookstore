@@ -30,21 +30,28 @@ List<String> list = <String>[
 ];
 
 class _SecondPageState extends State<SecondPage> {
-  TextEditingController controller = TextEditingController();
   TextEditingController controller1 = TextEditingController();
   TextEditingController controller2 = TextEditingController();
-  TextEditingController controller3 = TextEditingController();
+  late TextEditingController controller3;
   var key = GlobalKey<FormState>();
   bool pressed = false;
   late DatabaseHandler databasehandler;
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
-    controller1 = TextEditingController();
-    controller2 = TextEditingController();
-    controller3 = TextEditingController();
+
+    controller1 = TextEditingController.fromValue(
+        TextEditingValue(text: widget.book.noteTitle));
+    controller3 = TextEditingController.fromValue(
+        TextEditingValue(text: widget.book.note));
     databasehandler = DatabaseHandler();
+  }
+
+  @override
+  void dispose() {
+    controller3.dispose();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -58,6 +65,7 @@ class _SecondPageState extends State<SecondPage> {
           icon: Icon(
             Icons.arrow_back,
             color: Colors.black,
+            size: 32,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -68,6 +76,7 @@ class _SecondPageState extends State<SecondPage> {
       body: Form(
         key: key,
         child: Container(
+          height: size.height * 0.9,
           padding: const EdgeInsets.all(20.0),
           child: ListView(
             children: <Widget>[
@@ -85,7 +94,7 @@ class _SecondPageState extends State<SecondPage> {
               TextFormField(
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Enter New Note';
+                    return 'Enter New Title';
                   }
                   return null;
                 },
@@ -165,6 +174,12 @@ class _SecondPageState extends State<SecondPage> {
                 height: 20,
               ),
               TextFormField(
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter New Note";
+                  }
+                  return null;
+                },
                 onTap: () {
                   pressed = true;
                 },
@@ -194,7 +209,7 @@ class _SecondPageState extends State<SecondPage> {
                         hintStyle:
                             TextStyle(color: Colors.black38, fontSize: 20)),
                 keyboardType: TextInputType.multiline,
-                maxLines: 17,
+                maxLines: 20,
                 maxLength: 1500,
               ),
               SizedBox(
@@ -209,10 +224,13 @@ class _SecondPageState extends State<SecondPage> {
                     if (!key.currentState!.validate()) {
                       return;
                     }
+
                     if (widget.book != null) {
                       await databasehandler.updateData(Book.withId(
-                        widget.book.id,
-                          controller1.text, _dropDownValue, controller3.text));
+                          widget.book.id,
+                          controller1.text,
+                          _dropDownValue,
+                          controller3.text));
                       Navigator.pop(context);
 
                       return;
