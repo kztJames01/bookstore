@@ -56,40 +56,38 @@ class _CategoryState extends State<Category> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
 
-    Widget content(String noteTitle, String category,Book book) {
-      return ListTileTheme(
-        contentPadding: EdgeInsets.all(10),
-        tileColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          children: [
-            GestureDetector(
+    Widget content(String noteTitle, String category, Book book) {
+      return Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                color: Colors.black, borderRadius: BorderRadius.circular(20)),
+            margin: EdgeInsets.only(right: 20),
+            child: ListTile(
               onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context)=> notePage(title: book)));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => notePage(title: book)));
               },
-              child: ListTile(
-                title: Text(
-                  noteTitle,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  category,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                ),
+              title: Text(
+                noteTitle,
+                style: TextStyle(
+                    color: Colors.greenAccent,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                category,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(
-              height: 10,
-            )
-          ],
-        ),
+          ),
+          SizedBox(
+            height: 10,
+          )
+        ],
       );
     }
 
@@ -133,18 +131,24 @@ class _CategoryState extends State<Category> {
                       height: size.height * 0.75,
                       child: AzListView(
                         indexBarOptions: IndexBarOptions(
+                            indexHintDecoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              color: Colors.greenAccent,
+                            ),
+                            indexHintTextStyle:
+                                TextStyle(color: Colors.black, fontSize: 30,fontWeight: FontWeight.bold),
                             selectTextStyle: TextStyle(
                                 color: Colors.greenAccent, fontSize: 12),
                             downTextStyle:
                                 TextStyle(color: Colors.black, fontSize: 12),
                             color: Colors.white),
-                        indexBarWidth: 10,
+                        indexBarWidth: 20,
                         padding: EdgeInsets.all(10),
                         data: dataItems,
                         itemCount: dataItems.length,
                         itemBuilder: (context, index) {
                           return content(dataItems[index].title,
-                              dataItems[index].category,snapshot.data![index]);
+                              dataItems[index].category, snapshot.data![index]);
                         },
                       ),
                     );
