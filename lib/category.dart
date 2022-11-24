@@ -1,16 +1,15 @@
 import 'package:azlistview/azlistview.dart';
 import 'package:bookstore/books.dart';
 import 'package:bookstore/database_handler.dart';
+import 'package:bookstore/notepage.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-
-
 
 class _AZitem extends ISuspensionBean {
   String title;
   String tag;
-  
-  _AZitem({required this.tag, required this.title});
+  String category;
+  _AZitem({required this.tag, required this.title, required this.category});
 
   @override
   String getSuspensionTag() => tag;
@@ -45,8 +44,10 @@ class _CategoryState extends State<Category> {
 
   _initList(List<Book> items) async {
     dataItems = await items
-        .map((item) =>
-            _AZitem(tag: item.noteTitle[0].toUpperCase(), title: item.noteTitle))
+        .map((item) => _AZitem(
+            category: item.category,
+            tag: item.noteTitle[0].toUpperCase(),
+            title: item.noteTitle))
         .toList();
     SuspensionUtil.sortListBySuspensionTag(dataItems);
   }
@@ -55,27 +56,33 @@ class _CategoryState extends State<Category> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
 
-    Widget content(String noteTitle, String category) {
+    Widget content(String noteTitle, String category,Book book) {
       return ListTileTheme(
         contentPadding: EdgeInsets.all(10),
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Column(
           children: [
-            ListTile(
-              title: Text(
-                noteTitle,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                category,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context)=> notePage(title: book)));
+              },
+              child: ListTile(
+                title: Text(
+                  noteTitle,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  category,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
             SizedBox(
@@ -136,8 +143,8 @@ class _CategoryState extends State<Category> {
                         data: dataItems,
                         itemCount: dataItems.length,
                         itemBuilder: (context, index) {
-                          return content(
-                              dataItems[index].title, dataItems[index].tag);
+                          return content(dataItems[index].title,
+                              dataItems[index].category,snapshot.data![index]);
                         },
                       ),
                     );
