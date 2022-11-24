@@ -37,6 +37,7 @@ class _notePageState extends State<notePage> {
   Widget _editText(bool isEditable, String note) {
     return isEditable
         ? Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               TextFormField(
                 decoration: InputDecoration(
@@ -48,7 +49,7 @@ class _notePageState extends State<notePage> {
                 },
                 controller: _controller,
                 keyboardType: TextInputType.multiline,
-                maxLines: 22,
+                maxLines: 20,
                 maxLength: 2000,
                 style: TextStyle(
                     letterSpacing: 1.15,

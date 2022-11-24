@@ -1,5 +1,6 @@
 import 'package:bookstore/BookList.dart';
 import 'package:bookstore/books.dart';
+import 'package:bookstore/category.dart';
 import 'package:bookstore/cubit/drop_down_cubit.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,8 +41,8 @@ class _HiState extends State<Hi> {
           create: (context) => DropDownCubit(),
         ),
         BlocProvider(create: (context) => DropDownCubit1()),
-        BlocProvider(create: (context)=> searchCubit2()),
-        BlocProvider(create: (context)=> edit())
+        BlocProvider(create: (context) => searchCubit2()),
+        BlocProvider(create: (context) => edit())
       ],
       child: MaterialApp(
         title: "Notes",
@@ -330,15 +331,15 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                             controller: controller3,
                                             onFieldSubmitted: ((value) =>
                                                 controller3.text),
-                                            decoration: pressed 
+                                            decoration: pressed
                                                 ? InputDecoration(
                                                     border: OutlineInputBorder(
                                                         borderSide: BorderSide(
                                                             color:
                                                                 Colors.black12),
                                                         borderRadius:
-                                                            BorderRadius.circular(
-                                                                10)),
+                                                            BorderRadius
+                                                                .circular(10)),
                                                     hintText: "Enter Notes",
                                                     hintStyle: TextStyle(
                                                         color: Colors.black38,
@@ -355,12 +356,15 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                                                             color:
                                                                 Colors.black12),
                                                         borderRadius:
-                                                            BorderRadius.circular(
-                                                                10)),
+                                                            BorderRadius
+                                                                .circular(10)),
                                                     hintText: "Enter Notes",
-                                                    hintStyle: TextStyle(color: Colors.black12, fontSize: 16, fontStyle: FontStyle.italic),
-                                                
-                                                   ),
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.black12,
+                                                        fontSize: 16,
+                                                        fontStyle:
+                                                            FontStyle.italic),
+                                                  ),
                                             keyboardType:
                                                 TextInputType.multiline,
                                             maxLines: 17,
@@ -462,9 +466,13 @@ class _HelloState extends State<Hello> with TickerProviderStateMixin {
                       title: const Text("My Account"),
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        drawercontroller.hideDrawer();
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Category()));
+                      },
                       leading: const Icon(FluentIcons.history_24_regular),
-                      title: const Text("Pomodoro List"),
+                      title: const Text("Category"),
                     ),
                     ListTile(
                       onTap: () {},
